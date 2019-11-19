@@ -5,22 +5,20 @@
 //  Copyright © 2019 Alexandros Alexiou. All rights reserved.
 //
 #include <iostream>
-#include <OpenGL/OpenGL.h>
-#include <GLUT/GLUT.h>
 #include <string.h>
 #include <math.h>
 #include <cstdlib>
 #include <ctime>
-#include <OpenAL/OpenAL.h>
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
-#include <OpenAL/alut.h>
-#include <OpenAL/MacOSX_OALExtensions.h>
+#include <OpenGL/OpenGL.h>
+#include <GLUT/GLUT.h>
 #include "Include/Cube.h"
 
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 600
-
+#define maxx 15
+#define maxy 15
+#define dx 40
+#define dy 40
 
 using namespace std;
 // Prototypes
@@ -32,6 +30,7 @@ void display();
 void Menu(int choice);
 void reshape(GLsizei width, GLsizei height);
 void arrowFunctions(int key,int x,int y);
+void idle(void);
 
 // Global Variables
 int num = 0;
@@ -44,11 +43,13 @@ bool move_left = false;
 bool move_right = false;
 bool move_up = false;
 bool move_down = false;
+GLint i,j,stroke=0,pastx,pasty,nextx,nexty,swapthetwo=0;
+
 
 //Default Transformation Variables
-double x =0;
-double y=0;
-double z = -10.5;
+double x =-1.0;
+double y=-0.85;
+double z = -3.5;
 GLubyte red = 0;
 GLubyte green = 0;
 GLubyte blue = 0;
@@ -59,7 +60,7 @@ Cube array[15][15];
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE);
-    glutInitWindowPosition(100, 100);
+    glutInitWindowPosition(0, 0);
     glutInitWindowSize(SCREEN_WIDTH,SCREEN_HEIGHT);
     glutCreateWindow("VraXaPsa III");
     glutCreateMenu(Menu);
@@ -67,10 +68,10 @@ int main(int argc, char** argv) {
     glutAddMenuEntry("Exit", 2);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     glutKeyboardFunc(keyboard);
-    glutSpecialFunc(arrowFunctions);
-    glutMouseFunc(mouseButton);
-    glutIdleFunc(display);
+    //glutSpecialFunc(arrowFunctions);
     glutDisplayFunc(display);
+    glutIdleFunc(idle);
+    glutMouseFunc(mouseButton);
     glutReshapeFunc(reshape);       // Register callback handler for window re-size event
     initGL();
     glutMainLoop();
@@ -79,25 +80,23 @@ int main(int argc, char** argv) {
 
 
 void initGL() {
-    
     glEnable(GL_DEPTH);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
-    glClearDepth(1.0f);                   // Set background depth to farthest
+    //glClearDepth(1.0f);                   // Set background depth to farthest
     glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
     glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
     glShadeModel(GL_SMOOTH);   // Enable smooth shading
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
+    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     glTranslatef(-6, -6, -15.5);
-    
     
     int i,j,rng;
     srand( static_cast<unsigned int>(time(0)));
-    for(i=0; i < 15; i++){
+    for(i=0; i < maxx; i++){
         
-        for(j=0; j < 15; j++){
+        for(j=0; j < maxy; j++){
             
             rng = (rand()%5)+1;
-            cout<< rng<<endl;
     
             if(rng==1){
                 ::array[i][j].setBlue(255);
@@ -122,9 +121,6 @@ void initGL() {
             }
         }
     }
-    /*for(i=0; i < 15; i++)
-        for(j=0; j < 15; j++)
-            cout<<array[i][j].getCubeTexture()<<endl;*/
 }
 
 void arrowFunctions(int key, int x, int y) {
@@ -156,7 +152,7 @@ void keyboard(unsigned char c, int x, int y) {
         exit(0);
     }
     if (c == 61) {
-        //we need to zoom in,with '=' no shift required    ;)
+        //we need to zoom in,with '=' no shift required
         zoom_in = true;
         printf("ZOOM IN\n");
     }
@@ -168,26 +164,53 @@ void keyboard(unsigned char c, int x, int y) {
 }
 
 void mouseButton(int button, int state, int x, int y) {
-    if (button == GLUT_RIGHT_BUTTON) {
-        if (state == GLUT_UP) {
-            printf("Right\n");
-            cout << "\n";
-            cout << "X IS: " << x;
-            cout << "\n";
-            cout << "Y IS: " << y;
-        }
+   // printf("x=%d,y=%d\n",x,y);
+    y=600-y;
+    if((stroke == 0) && (button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN))
+    {
+        stroke=1;
+        pastx=x;
+        pasty=y;
+        //printf("pastx=%d,%d\n",pastx/dx,pasty/dy);
     }
-    if (button == GLUT_LEFT_BUTTON) {
-        if (state == GLUT_UP) {
-            printf("\nLeft\n");
-            cout << "\n";
-            cout << "X IS: " << x;
-            cout << "\n";
-            cout << "Y IS: " << y;
-        }
-
+    if((stroke == 1) && (button == GLUT_LEFT_BUTTON) && (state== GLUT_UP))
+    {
+        stroke=0;
+        nextx=x;
+        nexty=y;
+        //printf("nextx=%d,%d\n",nextx/dx,nexty/dy);
+        if((((pastx/dx)-(nextx/dx)) == 1) && ((pasty/dy) == (nexty/dy)))
+            swapthetwo=1;
+        if((((pasty/dy)-(nexty/dy)) == 1) && ((pastx/dx) == (nextx/dx)))
+            swapthetwo=1;
     }
 
+}
+
+
+void idle(void){
+    int tempRed;
+    int tempGreen;
+    int tempBlue;
+    
+    if(swapthetwo)
+    {
+        swapthetwo=0;
+        tempRed=::array[pastx/dx][pasty/dy].getRed();
+        tempGreen=::array[pastx/dx][pasty/dy].getGreen();
+        tempBlue=::array[pastx/dx][pasty/dy].getBlue();
+        
+        ::array[pastx/dx][pasty/dy].setRed(::array[nextx/dx][nexty/dy].getRed());
+        ::array[pastx/dx][pasty/dy].setGreen(::array[nextx/dx][nexty/dy].getGreen());
+        ::array[pastx/dx][pasty/dy].setBlue(::array[nextx/dx][nexty/dy].getBlue());
+        
+        ::array[nextx/dx][nexty/dy].setRed(tempRed);
+        ::array[nextx/dx][nexty/dy].setGreen(tempGreen);
+        ::array[nextx/dx][nexty/dy].setBlue(tempBlue);
+        
+        //printf("swapped");
+    }
+    glutPostRedisplay();
 }
 
 void printer(double x, double y, char* string) {
@@ -204,36 +227,40 @@ void printer(double x, double y, char* string) {
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //katharizei k dinei to background color
-    glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
-    
+    //glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
    
     if (game == 0) {
-        for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 15; j++) {
+        for (int i = 0; i < maxx; i++) {
+            for (int j = 0; j < maxy; j++) {
                 glPushMatrix();
                 glColor3ub(207, 185, 151);
                 glTranslatef(x + i, y + j, z);
+                ::array[i][j].setX(x + i);
+                ::array[i][j].setY(y+j);
+                ::array[i][j].setZ(z);
                 glutSolidCube(0.7);
                 glPopMatrix();
             }
         }
     }
     else {
-        glPushMatrix();
+        /*glPushMatrix();
         glColor3ub(255, 0, 255);
         printer(0, 12, score);
         printer(0, 11.5, moves);
-        glPopMatrix();
-        for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 15; j++) {
+        glPopMatrix();*/
+        for (int i = 0; i < maxx; i++) {
+            for (int j = 0; j < maxy; j++) {
                 glPushMatrix();
                 glColor3ub(::array[i][j].getRed(),::array[i][j].getGreen(),::array[i][j].getBlue());
-                glTranslatef(x + i, y + j, z);
+                glTranslatef(::array[i][j].getX(), ::array[i][j].getY(), ::array[i][j].getZ());
+                //printf(" SUNTETAGMENES KUVOU i=%d j=%d\n",i,j);
+                //printf(" x=%f y=%f z=%f",::array[i][j].getX(),::array[i][j].getY(),::array[i][j].getZ());
                 glutSolidCube(0.7);
                 glPopMatrix();
             }
         }
-        if (zoom_in) {
+        /*if (zoom_in) {
             gluLookAt(0, 0, -10.5, 0, 0, -15.5,0, 1, -15.5);
             zoom_in = false;
         }
@@ -261,11 +288,13 @@ void display() {
         if (move_down) {
             gluLookAt(0, -1, 0, 0, -1, -15.5, 0, 1, -15.5);
             move_down = false;
-        }
+        }*/
     }
     glFlush();
     glutSwapBuffers();
 }
+
+
 
 void Menu(int choice) {
     if (choice == 1) {
