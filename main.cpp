@@ -35,8 +35,10 @@ void idle(void);
 // Global Variables
 int num = 0;
 bool game = 0;
-char score[9] = "Score: 0";
-char moves[10] = "Moves: 30";
+char score[7] = "Score:";
+char moves[7] = "Moves:";
+char game_over[10]="GAME OVER";
+int moves_remaining=30;
 bool zoom_in = false;
 bool zoom_out = false;
 bool move_left = false;
@@ -55,7 +57,7 @@ GLubyte green = 0;
 GLubyte blue = 0;
 
 //Data structure of Cubes
-Cube array[15][15];
+Cube cubes_render_board[15][15];
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
@@ -99,25 +101,25 @@ void initGL() {
             rng = (rand()%5)+1;
     
             if(rng==1){
-                ::array[i][j].setBlue(255);
+                ::cubes_render_board[i][j].setBlue(255);
                 
             }else if (rng==2){
-                ::array[i][j].setRed(255);
+                ::cubes_render_board[i][j].setRed(255);
                 
             }else if (rng==3){
-                ::array[i][j].setCubeTexture("Psalidi");
-                ::array[i][j].setGreen(255);
+                ::cubes_render_board[i][j].setCubeTexture("Psalidi");
+                ::cubes_render_board[i][j].setGreen(255);
                 
             }else if(rng==4){
-                ::array[i][j].setCubeTexture("Vraxos");
-                ::array[i][j].setRed(255);
-                ::array[i][j].setGreen(255);
-                ::array[i][j].setBlue(255);
+                ::cubes_render_board[i][j].setCubeTexture("Vraxos");
+                ::cubes_render_board[i][j].setRed(255);
+                ::cubes_render_board[i][j].setGreen(255);
+                ::cubes_render_board[i][j].setBlue(255);
                 
             }else{
-                ::array[i][j].setCubeTexture("Xarti");
-                ::array[i][j].setRed(255);
-                ::array[i][j].setBlue(255);
+                ::cubes_render_board[i][j].setCubeTexture("Xarti");
+                ::cubes_render_board[i][j].setRed(255);
+                ::cubes_render_board[i][j].setBlue(255);
             }
         }
     }
@@ -179,9 +181,9 @@ void mouseButton(int button, int state, int x, int y) {
         nextx=x;
         nexty=y;
         //printf("nextx=%d,%d\n",nextx/dx,nexty/dy);
-        if((((pastx/dx)-(nextx/dx)) == 1) && ((pasty/dy) == (nexty/dy)))
+        if((abs((pastx/dx)-(nextx/dx)) == 1) && ((pasty/dy) == (nexty/dy)))
             swapthetwo=1;
-        if((((pasty/dy)-(nexty/dy)) == 1) && ((pastx/dx) == (nextx/dx)))
+        if((abs((pasty/dy)-(nexty/dy)) == 1) && ((pastx/dx) == (nextx/dx)))
             swapthetwo=1;
     }
 
@@ -196,19 +198,26 @@ void idle(void){
     if(swapthetwo)
     {
         swapthetwo=0;
-        tempRed=::array[pastx/dx][pasty/dy].getRed();
-        tempGreen=::array[pastx/dx][pasty/dy].getGreen();
-        tempBlue=::array[pastx/dx][pasty/dy].getBlue();
+        tempRed=::cubes_render_board[pastx/dx][pasty/dy].getRed();
+        tempGreen=::cubes_render_board[pastx/dx][pasty/dy].getGreen();
+        tempBlue=::cubes_render_board[pastx/dx][pasty/dy].getBlue();
         
-        ::array[pastx/dx][pasty/dy].setRed(::array[nextx/dx][nexty/dy].getRed());
-        ::array[pastx/dx][pasty/dy].setGreen(::array[nextx/dx][nexty/dy].getGreen());
-        ::array[pastx/dx][pasty/dy].setBlue(::array[nextx/dx][nexty/dy].getBlue());
+        ::cubes_render_board[pastx/dx][pasty/dy].setRed(::cubes_render_board[nextx/dx][nexty/dy].getRed());
+        ::cubes_render_board[pastx/dx][pasty/dy].setGreen(::cubes_render_board[nextx/dx][nexty/dy].getGreen());
+        ::cubes_render_board[pastx/dx][pasty/dy].setBlue(::cubes_render_board[nextx/dx][nexty/dy].getBlue());
         
-        ::array[nextx/dx][nexty/dy].setRed(tempRed);
-        ::array[nextx/dx][nexty/dy].setGreen(tempGreen);
-        ::array[nextx/dx][nexty/dy].setBlue(tempBlue);
+        ::cubes_render_board[nextx/dx][nexty/dy].setRed(tempRed);
+        ::cubes_render_board[nextx/dx][nexty/dy].setGreen(tempGreen);
+        ::cubes_render_board[nextx/dx][nexty/dy].setBlue(tempBlue);
         
         //printf("swapped");
+        int pastX=pastx/dx;
+        int pastY=pasty/dy;
+        
+        int nextX=nextx/dx;
+        int nextY=nexty/dy;
+        printf("SWAPPED:\n");
+        printf("pastX=%d pastY=%d -------->  nextX=%d nextY=%d\n",pastX,pastY,nextX,nextY);
     }
     glutPostRedisplay();
 }
@@ -228,32 +237,27 @@ void printer(double x, double y, char* string) {
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //katharizei k dinei to background color
     //glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
-   
     if (game == 0) {
         for (int i = 0; i < maxx; i++) {
             for (int j = 0; j < maxy; j++) {
                 glPushMatrix();
                 glColor3ub(207, 185, 151);
                 glTranslatef(x + i, y + j, z);
-                ::array[i][j].setX(x + i);
-                ::array[i][j].setY(y+j);
-                ::array[i][j].setZ(z);
+                ::cubes_render_board[i][j].setX(x + i);
+                ::cubes_render_board[i][j].setY(y+j);
+                ::cubes_render_board[i][j].setZ(z);
                 glutSolidCube(0.7);
                 glPopMatrix();
             }
         }
     }
-    else {
-        /*glPushMatrix();
-        glColor3ub(255, 0, 255);
-        printer(0, 12, score);
-        printer(0, 11.5, moves);
-        glPopMatrix();*/
+   
+    if(game==1){
         for (int i = 0; i < maxx; i++) {
             for (int j = 0; j < maxy; j++) {
                 glPushMatrix();
-                glColor3ub(::array[i][j].getRed(),::array[i][j].getGreen(),::array[i][j].getBlue());
-                glTranslatef(::array[i][j].getX(), ::array[i][j].getY(), ::array[i][j].getZ());
+                glColor3ub(::cubes_render_board[i][j].getRed(),::cubes_render_board[i][j].getGreen(),::cubes_render_board[i][j].getBlue());
+                glTranslatef(::cubes_render_board[i][j].getX(), ::cubes_render_board[i][j].getY(), ::cubes_render_board[i][j].getZ());
                 //printf(" SUNTETAGMENES KUVOU i=%d j=%d\n",i,j);
                 //printf(" x=%f y=%f z=%f",::array[i][j].getX(),::array[i][j].getY(),::array[i][j].getZ());
                 glutSolidCube(0.7);
