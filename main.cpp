@@ -13,14 +13,16 @@
 #include <GLUT/GLUT.h>
 #include "Include/Cube.h"
 
+using namespace std;
+
+//DEFINES
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 600
 #define maxx 15
 #define maxy 15
-#define dx 40
-#define dy 40
+#define dx 40 // cube pixel width
+#define dy 40 // cube pixel height
 
-using namespace std;
 // Prototypes
 void initGL();
 void printer(double x, double y, char* string);
@@ -31,10 +33,12 @@ void Menu(int choice);
 void reshape(GLsizei width, GLsizei height);
 void arrowFunctions(int key,int x,int y);
 void idle(void);
+void  mySolidCube(GLdouble size);
+static void drawBox(GLfloat size, GLenum type);
 
 // Global Variables
 int num = 0;
-bool game = 0;
+int game = 0;
 char score[7] = "Score:";
 char moves[7] = "Moves:";
 char game_over[10]="GAME OVER";
@@ -45,13 +49,14 @@ bool move_left = false;
 bool move_right = false;
 bool move_up = false;
 bool move_down = false;
-GLint i,j,stroke=0,pastx,pasty,nextx,nexty,swapthetwo=0;
-
+GLint i,j,stroke=0,pastx,pasty,nextx,nexty,swap_state=0;
 
 //Default Transformation Variables
 double x =-1.0;
 double y=-0.85;
 double z = -3.5;
+
+//RGB values
 GLubyte red = 0;
 GLubyte green = 0;
 GLubyte blue = 0;
@@ -59,10 +64,11 @@ GLubyte blue = 0;
 //Data structure of Cubes
 Cube cubes_render_board[15][15];
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE);
-    glutInitWindowPosition(0, 0);
+    glutInitWindowPosition(300, 300);
     glutInitWindowSize(SCREEN_WIDTH,SCREEN_HEIGHT);
     glutCreateWindow("VraXaPsa III");
     glutCreateMenu(Menu);
@@ -81,7 +87,8 @@ int main(int argc, char** argv) {
 
 
 
-void initGL() {
+void initGL()
+{
     glEnable(GL_DEPTH);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
     //glClearDepth(1.0f);                   // Set background depth to farthest
@@ -94,30 +101,34 @@ void initGL() {
     
     int i,j,rng;
     srand( static_cast<unsigned int>(time(0)));
-    for(i=0; i < maxx; i++){
-        
-        for(j=0; j < maxy; j++){
-            
-            rng = (rand()%5)+1;
-    
-            if(rng==1){
+    for(i=0; i < maxx; i++)
+    {
+        for(j=0; j < maxy; j++)
+        {
+            rng = (rand()%5)+1;//pick a random number in range [1,5]
+            if(rng==1)
+            {
                 ::cubes_render_board[i][j].setBlue(255);
-                
-            }else if (rng==2){
+            }
+            else if (rng==2)
+            {
                 ::cubes_render_board[i][j].setRed(255);
-                
-            }else if (rng==3){
-                ::cubes_render_board[i][j].setCubeTexture("Psalidi");
+            }
+            else if (rng==3)
+            {
+                ::cubes_render_board[i][j].setCubeTexture("Scissors");
                 ::cubes_render_board[i][j].setGreen(255);
-                
-            }else if(rng==4){
-                ::cubes_render_board[i][j].setCubeTexture("Vraxos");
+            }
+            else if(rng==4)
+            {
+                ::cubes_render_board[i][j].setCubeTexture("Rock");
                 ::cubes_render_board[i][j].setRed(255);
                 ::cubes_render_board[i][j].setGreen(255);
                 ::cubes_render_board[i][j].setBlue(255);
-                
-            }else{
-                ::cubes_render_board[i][j].setCubeTexture("Xarti");
+            }
+            else
+            {
+                ::cubes_render_board[i][j].setCubeTexture("Paper");
                 ::cubes_render_board[i][j].setRed(255);
                 ::cubes_render_board[i][j].setBlue(255);
             }
@@ -125,47 +136,57 @@ void initGL() {
     }
 }
 
-void arrowFunctions(int key, int x, int y) {
-    if (key == GLUT_KEY_UP) {
-        cout << "Camera Panw\n";
+void arrowFunctions(int key, int x, int y)
+{
+    if (key == GLUT_KEY_UP)
+    {
+        cout << "Camera up\n";
         move_up = true;
         
     }
-    if (key == GLUT_KEY_DOWN) {
-        cout << "Camera Katw\n";
+    if (key == GLUT_KEY_DOWN)
+    {
+        cout << "Camera down\n";
         move_down = true;
     }
-    if (key == GLUT_KEY_RIGHT) {
-        cout << "Camera dexia\n";
+    if (key == GLUT_KEY_RIGHT)
+    {
+        cout << "Camera right\n";
         move_right = true;
 
     }
-    if (key == GLUT_KEY_LEFT) {
-        cout << "Camera Aristera\n";
+    if (key == GLUT_KEY_LEFT)
+    {
+        cout << "Camera left\n";
         move_left = true;
     }
 
 }
 
 
-void keyboard(unsigned char c, int x, int y) {
-    if (c == 27) {
+void keyboard(unsigned char c, int x, int y)
+{
+    if (c == 27)
+    {
         printf("esc");
         exit(0);
     }
-    if (c == 61) {
+    if (c == 61)
+    {
         //we need to zoom in,with '=' no shift required
         zoom_in = true;
         printf("ZOOM IN\n");
     }
-    if (c == 45) {
+    if (c == 45)
+    {
         //we need to zoom out with '-'
         zoom_out = true;
         printf("ZOOM OUT\n");
     }
 }
 
-void mouseButton(int button, int state, int x, int y) {
+void mouseButton(int button, int state, int x, int y)
+{
    // printf("x=%d,y=%d\n",x,y);
     y=600-y;
     if((stroke == 0) && (button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN))
@@ -181,23 +202,22 @@ void mouseButton(int button, int state, int x, int y) {
         nextx=x;
         nexty=y;
         //printf("nextx=%d,%d\n",nextx/dx,nexty/dy);
-        if((abs((pastx/dx)-(nextx/dx)) == 1) && ((pasty/dy) == (nexty/dy)))
-            swapthetwo=1;
-        if((abs((pasty/dy)-(nexty/dy)) == 1) && ((pastx/dx) == (nextx/dx)))
-            swapthetwo=1;
+        if( ( (abs((pastx/dx)-(nextx/dx)) == 1) && ((pasty/dy) == (nexty/dy)) ) || ( (abs((pasty/dy)-(nexty/dy)) == 1) && ((pastx/dx) == (nextx/dx)) ) )
+            swap_state=1;
     }
 
 }
 
 
-void idle(void){
+void idle(void)
+{
     int tempRed;
     int tempGreen;
     int tempBlue;
     
-    if(swapthetwo)
+    if(swap_state)
     {
-        swapthetwo=0;
+        swap_state=0;
         tempRed=::cubes_render_board[pastx/dx][pasty/dy].getRed();
         tempGreen=::cubes_render_board[pastx/dx][pasty/dy].getGreen();
         tempBlue=::cubes_render_board[pastx/dx][pasty/dy].getBlue();
@@ -210,7 +230,7 @@ void idle(void){
         ::cubes_render_board[nextx/dx][nexty/dy].setGreen(tempGreen);
         ::cubes_render_board[nextx/dx][nexty/dy].setBlue(tempBlue);
         
-        //printf("swapped");
+        //Checks
         int pastX=pastx/dx;
         int pastY=pasty/dy;
         
@@ -218,78 +238,151 @@ void idle(void){
         int nextY=nexty/dy;
         printf("SWAPPED:\n");
         printf("pastX=%d pastY=%d -------->  nextX=%d nextY=%d\n",pastX,pastY,nextX,nextY);
+        moves_remaining--;
     }
     glutPostRedisplay();
 }
 
-void printer(double x, double y, char* string) {
+void printer(double x, double y, char* string)
+{
     //set the position of the text in the window using the x and y coordinates
     glRasterPos2f(x, y);
     //get the length of the string to display
     int len = (int)strlen(string);
     // loop to display character by character
     glColor3ub(255, 0, 200);
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++)
+    {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, string[i]);
     }
 }
 
-void display() {
+
+static void drawBox(GLfloat size, GLenum type)
+{
+  static GLfloat n[6][3] =
+  {
+    {-1.0, 0.0, 0.0},
+    {0.0, 1.0, 0.0},
+    {1.0, 0.0, 0.0},
+    {0.0, -1.0, 0.0},
+    {0.0, 0.0, 1.0},
+    {0.0, 0.0, -1.0}
+  };
+  static GLint faces[6][4] =
+  {
+    {0, 1, 2, 3},
+    {3, 2, 6, 7},
+    {7, 6, 5, 4},
+    {4, 5, 1, 0},
+    {5, 6, 2, 1},
+    {7, 4, 0, 3}
+  };
+  GLfloat v[8][3];
+  GLint i;
+
+  v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+  v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
+  v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+  v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
+  v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+  v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
+
+  for (i = 5; i >= 0; i--) {
+    glBegin(type);
+    glNormal3fv(&n[i][0]);
+    glVertex3fv(&v[faces[i][0]][0]);
+    glVertex3fv(&v[faces[i][1]][0]);
+    glVertex3fv(&v[faces[i][2]][0]);
+    glVertex3fv(&v[faces[i][3]][0]);
+    glEnd();
+  }
+}
+
+void  mySolidCube(GLdouble size)
+{
+  drawBox(size, GL_QUADS);
+}
+
+void display()
+{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //katharizei k dinei to background color
     //glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
-    if (game == 0) {
-        for (int i = 0; i < maxx; i++) {
-            for (int j = 0; j < maxy; j++) {
+    
+    if(moves_remaining==0)
+    {
+        glPushMatrix();
+        glColor3ub(255, 0, 255);
+        glScalef(1, 1 ,1);
+        printer(5.5, 6, game_over);
+        glPopMatrix();
+        game=-1;
+    }
+    if (game == 0)
+    {
+        for (int i = 0; i < maxx; i++)
+        {
+            for (int j = 0; j < maxy; j++)
+            {
                 glPushMatrix();
                 glColor3ub(207, 185, 151);
                 glTranslatef(x + i, y + j, z);
                 ::cubes_render_board[i][j].setX(x + i);
                 ::cubes_render_board[i][j].setY(y+j);
                 ::cubes_render_board[i][j].setZ(z);
-                glutSolidCube(0.7);
+                mySolidCube(0.7);
                 glPopMatrix();
             }
         }
     }
    
-    if(game==1){
-        for (int i = 0; i < maxx; i++) {
-            for (int j = 0; j < maxy; j++) {
+    if(game==1)
+    {
+        for (int i = 0; i < maxx; i++)
+        {
+            for (int j = 0; j < maxy; j++)
+            {
                 glPushMatrix();
                 glColor3ub(::cubes_render_board[i][j].getRed(),::cubes_render_board[i][j].getGreen(),::cubes_render_board[i][j].getBlue());
                 glTranslatef(::cubes_render_board[i][j].getX(), ::cubes_render_board[i][j].getY(), ::cubes_render_board[i][j].getZ());
                 //printf(" SUNTETAGMENES KUVOU i=%d j=%d\n",i,j);
                 //printf(" x=%f y=%f z=%f",::array[i][j].getX(),::array[i][j].getY(),::array[i][j].getZ());
-                glutSolidCube(0.7);
+                mySolidCube(0.7);
                 glPopMatrix();
             }
         }
-        /*if (zoom_in) {
+        /*if (zoom_in)
+         {
             gluLookAt(0, 0, -10.5, 0, 0, -15.5,0, 1, -15.5);
             zoom_in = false;
         }
-        if (zoom_out) {
+        if (zoom_out)
+        {
             
             gluLookAt(0, 0, 10.5, 0, 0, -15.5, 0, 1, -15.5);
             
             zoom_out = false;
         }
-        if (move_left) {
+        if (move_left)
+        {
             gluLookAt(-1, 0, 0,-1, 0, -15.5, 0, 1, -15.5);
 
             move_left = false;
             
         }
-        if (move_right) {
+        if (move_right)
+        {
             gluLookAt(1, 0, 0, 1, 0, -15.5, 0, 1, -15.5);
             move_right = false;
 
         }
-        if (move_up) {
+        if (move_up)
+        {
             gluLookAt(0, 1, 0, 0, 1, -15.5, 0, 1, -15.5);
             move_up = false;
         }
-        if (move_down) {
+        if (move_down)
+        {
             gluLookAt(0, -1, 0, 0, -1, -15.5, 0, 1, -15.5);
             move_down = false;
         }*/
@@ -300,13 +393,16 @@ void display() {
 
 
 
-void Menu(int choice) {
-    if (choice == 1) {
+void Menu(int choice)
+{
+    if (choice == 1)
+    {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
         game = 1;
         
     }
-    if (choice == 2) {
+    if (choice == 2)
+    {
         exit(0);
     }
     
@@ -315,7 +411,8 @@ void Menu(int choice) {
 
 /* Handler for window re-size event.
 Called back when the window first appears and whenever the window is re-sized with its new width and height */
-void reshape(GLsizei width, GLsizei height) {
+void reshape(GLsizei width, GLsizei height)
+{
     // GLsizei for non-negative integer // Compute aspect ratio of the new window
     if (height == 0) height = 1; // To prevent divide by 0
     GLfloat aspect = (GLfloat)width / (GLfloat)height; // Set the viewport to cover the new window
