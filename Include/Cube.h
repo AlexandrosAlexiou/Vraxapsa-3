@@ -1,10 +1,4 @@
-//
-//  Cube.h
-//  VraXaPsa3
-//
-//  Created by Alexandros Alexiou on 16/11/19.
-//  Copyright © 2019 Alexandros Alexiou. All rights reserved.
-//
+
 #include <iostream>
 #include <string>
 
@@ -19,20 +13,21 @@ class Cube{
         //Default Constructor
         Cube() = default;
         //Constructor
-        Cube(string texture, int r, int g, int b,double x,double y,double z){
+        Cube(char * texture, int r, int g, int b,double x,double y,double z){
+            texture = (char*)malloc(15*sizeof(char));
             setCubeTexture(texture);
             setRed(r);
             setGreen(g);
             setBlue(b);
-            setX(0);
-            setY(0);
-            setZ(-10.5);
+            setX(x);
+            setY(y);
+            setZ(z);
         }
         // Getters-Setters
-        void setCubeTexture(string texture){
+        void setCubeTexture(char* texture){
             cubeTexture=texture;
         }
-        string getCubeTexture(){
+        char* getCubeTexture(){
             return cubeTexture;
         }
     
@@ -82,7 +77,7 @@ class Cube{
     
     //Fields
     private:
-        string cubeTexture="nothing";
+        char *cubeTexture;
         int red=0;
         int green=0;
         int blue=0;
