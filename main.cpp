@@ -28,7 +28,7 @@ using namespace std;
 
 // Prototypes
 void initGL();
-void printer(double x, double y, char* string);
+void printer(double x, double y, char const * string);
 void keyboard(unsigned char c, int x, int y);
 void mouseButton(int button, int state, int x, int y);
 void display();
@@ -38,13 +38,17 @@ void arrowFunctions(int key,int x,int y);
 void idle(void);
 void  mySolidCube(GLdouble size);
 static void drawBox(GLfloat size, GLenum type);
+void loadRockTexture(const char* filename);
+void loadPaperTexture(const char* filename);
+void loadScissorsTexture(const char* filename);
 
 // Global Variables
 int num = 0;
 int game = 0;
-char score[7] = "SCORE:";
-char moves[7] = "MOVES:";
-char game_over[10]="GAME OVER";
+int score_number=0;
+char const * score = "SCORE:";
+char const * moves = "MOVES:";
+char const * game_over="GAME OVER";
 int moves_remaining=30;
 bool zoom_in = false;
 bool zoom_out = false;
@@ -66,54 +70,14 @@ GLubyte blue = 0;
 
 //Data structure of Cubes
 Cube array[15][15];
+
+//Texture IDs
 unsigned int ID1;
 unsigned int ID2;
 unsigned int ID3;
 
 //Texture Names
 char texture_names[4][8] = { "nothing","Rock","Paper","Scissor" };
-
-void loadTexture1(const char* filename) {
-    int width, height,nrChannels;
-    unsigned char * data =stbi_load(filename, &width, &height, &nrChannels, 0);
-    
-    glGenTextures(1,&ID1);
-    glBindTexture(GL_TEXTURE_2D,ID1);
-    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GL{REPEAT
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
-    gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB,width,height,GL_RGB,GL_UNSIGNED_BYTE,data);
-}
-
-void loadTexture2(const char* filename) {
-    int width, height,nrChannels;
-    unsigned char * data =stbi_load(filename, &width, &height, &nrChannels, 0);
-    
-    glGenTextures(1,&ID2);
-    glBindTexture(GL_TEXTURE_2D,ID2);
-    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GL{REPEAT
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
-    gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB,width,height,GL_RGB,GL_UNSIGNED_BYTE,data);
-}
-
-void loadTexture3(const char* filename) {
-    int width, height,nrChannels;
-    unsigned char * data =stbi_load(filename, &width, &height, &nrChannels, 0);
-    
-    glGenTextures(1,&ID3);
-    glBindTexture(GL_TEXTURE_2D,ID3);
-    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GL{REPEAT
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
-    gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB,width,height,GL_RGB,GL_UNSIGNED_BYTE,data);
-}
 
 
 int main(int argc, char** argv)
@@ -141,9 +105,9 @@ int main(int argc, char** argv)
 
 void initGL()
 {
-    loadTexture1("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/stone.bmp");
-    loadTexture2("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/paper.png");
-    loadTexture3("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/scissors.bmp");
+    loadRockTexture("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/stone.bmp");
+    loadPaperTexture("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/paper.png");
+    loadScissorsTexture("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/scissors.bmp");
     glEnable(GL_DEPTH);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
     //glClearDepth(1.0f);                   // Set background depth to farthest
@@ -247,7 +211,10 @@ void keyboard(unsigned char c, int x, int y)
 
 void mouseButton(int button, int state, int x, int y)
 {
-    //printf("x=%d,y=%d\n",x,y);
+    if(y<20 || x>600 || y>600 || x<0){ //abort we have a margin of 20 pixels for the score and moves header on top of the screen.
+        return;
+    }
+    printf("x=%d,y=%d\n",x,y);
     y=600-y;
     if((stroke == 0) && (button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN))
     {
@@ -264,6 +231,7 @@ void mouseButton(int button, int state, int x, int y)
         //printf("nextx=%d,%d\n",nextx/dx,nexty/dy);
         if( ( (abs((pastx/dx)-(nextx/dx)) == 1) && ((pasty/dy) == (nexty/dy)) ) || ( (abs((pasty/dy)-(nexty/dy)) == 1) && ((pastx/dx) == (nextx/dx)) ) )
             swap_state=1;
+        
     }
 
 }
@@ -275,38 +243,39 @@ void idle(void)
     int tempGreen;
     int tempBlue;
     char *tempTexture;
+    if(game==0){ // interact with cubes only if the game is on
+        return;
+    }
     if (swap_state)
-        {
-            swap_state = 0;
-            tempRed = ::array[pastx / dx][pasty / dy].getRed();
-            tempGreen = ::array[pastx / dx][pasty / dy].getGreen();
-            tempBlue = ::array[pastx / dx][pasty / dy].getBlue();
-            
-            tempTexture=::array[pastx / dx][pasty / dy].getCubeTexture();
+    {
+        swap_state = 0;
+        tempRed = ::array[pastx / dx][pasty / dy].getRed();
+        tempGreen = ::array[pastx / dx][pasty / dy].getGreen();
+        tempBlue = ::array[pastx / dx][pasty / dy].getBlue();
+        
+        tempTexture=::array[pastx / dx][pasty / dy].getCubeTexture();
+        ::array[pastx / dx][pasty / dy].setRed(::array[nextx / dx][nexty / dy].getRed());
+        ::array[pastx / dx][pasty / dy].setGreen(::array[nextx / dx][nexty / dy].getGreen());
+        ::array[pastx / dx][pasty / dy].setBlue(::array[nextx / dx][nexty / dy].getBlue());
+        ::array[pastx / dx][pasty / dy].setCubeTexture( ::array[nextx / dx][nexty / dy].getCubeTexture());
     
-            ::array[pastx / dx][pasty / dy].setRed(::array[nextx / dx][nexty / dy].getRed());
-            ::array[pastx / dx][pasty / dy].setGreen(::array[nextx / dx][nexty / dy].getGreen());
-            ::array[pastx / dx][pasty / dy].setBlue(::array[nextx / dx][nexty / dy].getBlue());
-            ::array[pastx / dx][pasty / dy].setCubeTexture( ::array[nextx / dx][nexty / dy].getCubeTexture());
-    
-            ::array[nextx / dx][nexty / dy].setRed(tempRed);
-            ::array[nextx / dx][nexty / dy].setGreen(tempGreen);
-            ::array[nextx / dx][nexty / dy].setBlue(tempBlue);
-            ::array[nextx / dx][nexty / dy].setCubeTexture(tempTexture);
-            //Checks
-            int pastX=pastx/dx;
-            int pastY=pasty/dy;
-            
-            int nextX=nextx/dx;
-            int nextY=nexty/dy;
-            printf("SWAPPED:\n");
-            printf("pastX=%d pastY=%d -------->  nextX=%d nextY=%d\n",pastX,pastY,nextX,nextY);
-            moves_remaining--;
-        }
+        ::array[nextx / dx][nexty / dy].setRed(tempRed);
+        ::array[nextx / dx][nexty / dy].setGreen(tempGreen);
+        ::array[nextx / dx][nexty / dy].setBlue(tempBlue);
+        ::array[nextx / dx][nexty / dy].setCubeTexture(tempTexture);
+        //Checks
+        int pastX=pastx/dx;
+        int pastY=pasty/dy;
+        int nextX=nextx/dx;
+        int nextY=nexty/dy;
+        printf("SWAPPED:\n");
+        printf("pastX=%d pastY=%d <-------->  nextX=%d nextY=%d\n",pastX,pastY,nextX,nextY);
+        moves_remaining--;
+    }
     glutPostRedisplay();
 }
 
-void printer(double x, double y, char* string)
+void printer(double x, double y,char const * string)
 {
     //set the position of the text in the window using the x and y coordinates
     glRasterPos2f(x, y);
@@ -320,6 +289,47 @@ void printer(double x, double y, char* string)
     }
 }
 
+void loadRockTexture(const char* filename) {
+    int width, height,nrChannels;
+    unsigned char * data =stbi_load(filename, &width, &height, &nrChannels, 0);
+    
+    glGenTextures(1,&ID1);
+    glBindTexture(GL_TEXTURE_2D,ID1);
+    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GL{REPEAT
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
+    gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB,width,height,GL_RGB,GL_UNSIGNED_BYTE,data);
+}
+
+void loadPaperTexture(const char* filename) {
+    int width, height,nrChannels;
+    unsigned char * data =stbi_load(filename, &width, &height, &nrChannels, 0);
+    
+    glGenTextures(1,&ID2);
+    glBindTexture(GL_TEXTURE_2D,ID2);
+    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GL{REPEAT
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
+    gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB,width,height,GL_RGB,GL_UNSIGNED_BYTE,data);
+}
+
+void loadScissorsTexture(const char* filename) {
+    int width, height,nrChannels;
+    unsigned char * data =stbi_load(filename, &width, &height, &nrChannels, 0);
+    
+    glGenTextures(1,&ID3);
+    glBindTexture(GL_TEXTURE_2D,ID3);
+    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GL{REPEAT
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
+    gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB,width,height,GL_RGB,GL_UNSIGNED_BYTE,data);
+}
 
 static void drawBox(GLfloat size, GLenum type)
 {
@@ -351,13 +361,6 @@ static void drawBox(GLfloat size, GLenum type)
   v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
   v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
 
-  //glEnable(GL_TEXTURE_2D);
-  /*glBegin(GL_QUADS);
-  glTexCoord2f(1.0, 1.0);    glVertex3f(1.0, 1.0, 0.0);
-  glTexCoord2f(0.0, 1.0);    glVertex3f(-1.0, 1.0, 0.0);
-  glTexCoord2f(0.0, 0.0);    glVertex3f(-1.0, -1.0, 0.0);
-  glTexCoord2d(1.0, 0.0);    glVertex3f(1.0, -1.0, 0.0);
-  glEnd();*/
   glEnable(GL_TEXTURE_2D);
   for (i = 5; i >= 0; i--) {
       glBegin(type);
@@ -379,23 +382,34 @@ void  mySolidCube(GLdouble size)
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //katharizei k dinei to background color
-    //glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
+    glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
     
-    if(moves_remaining==0)
+    if(moves_remaining==0) //Game Over
     {
+        //Print game over
         glPushMatrix();
         glColor3ub(255, 0, 255);
         glScalef(1, 1 ,1);
         printer(5.5, 6, game_over);
         glPopMatrix();
         
+        //Print score
         glPushMatrix();
         glColor3ub(255, 0, 255);
         glScalef(1, 1 ,1);
         printer(5.5, 5, score);
         glPopMatrix();
+        
+        //Print score number
+        glPushMatrix();
+        glColor3ub(255, 0, 255);
+        string score_number_string=to_string(score_number);
+        char const *kchar = score_number_string.c_str();
+        printer(6.5, 5, kchar);
+        glPopMatrix();
         game=-1;
     }
+    
     if (game == 0)
     {
         for (int i = 0; i < maxx; i++)
@@ -405,9 +419,6 @@ void display()
                 glPushMatrix();
                 glColor3ub(207, 185, 151);
                 glTranslatef(x + i, y + j, z);
-                ::array[i][j].setX(x + i);
-                ::array[i][j].setY(y+j);
-                ::array[i][j].setZ(z);
                 glutSolidCube(0.7);
                 glPopMatrix();
             }
@@ -416,10 +427,35 @@ void display()
    
     if(game==1)
     {
+        //Print SCORE:
         glPushMatrix();
         glColor3ub(255, 0, 255);
         printer(10, 12, score);
         glPopMatrix();
+        
+        //Print score number
+        glPushMatrix();
+        glColor3ub(255, 0, 255);
+        string score_number_string=to_string(score_number);
+        char const *kchar = score_number_string.c_str();
+        printer(11, 12, kchar);
+        glPopMatrix();
+        
+        //Print MOVES:
+        glPushMatrix();
+        glColor3ub(255, 0, 255);
+        printer(0, 12, moves);
+        glPopMatrix();
+        
+        //Print remaining moves
+        glPushMatrix();
+        glColor3ub(255, 0, 255);
+        string moves_remaining_string = to_string(moves_remaining);
+        char const *pchar = moves_remaining_string.c_str();
+        printer(1, 12, pchar);
+        glPopMatrix();
+        
+        
         for (int i = 0; i < maxx; i++)
         {
             for (int j = 0; j < maxy; j++)
@@ -441,7 +477,7 @@ void display()
                 }
                 glPushMatrix();
                 glColor3ub(::array[i][j].getRed(),::array[i][j].getGreen(),::array[i][j].getBlue());
-                glTranslatef(::array[i][j].getX(), ::array[i][j].getY(), ::array[i][j].getZ());
+                glTranslatef(x + i, y + j, z);
                 //printf(" SUNTETAGMENES KUVOU i=%d j=%d\n",i,j);
                 //printf(" x=%f y=%f z=%f",::array[i][j].getX(),::array[i][j].getY(),::array[i][j].getZ());
                 mySolidCube(0.7);
@@ -514,6 +550,7 @@ void reshape(GLsizei width, GLsizei height)
     if (height == 0) height = 1; // To prevent divide by 0
     GLfloat aspect = (GLfloat)width / (GLfloat)height; // Set the viewport to cover the new window
     glViewport(0, 0, width, height); // Set the aspect ratio of the clipping volume
+    glutReshapeWindow(600, 600);
     glMatrixMode(GL_PROJECTION); // To operate on the Projection matrix
     glLoadIdentity(); // Reset // Enable perspective projection with fovy, aspect, zNear and zFar
     gluPerspective(45.0f, aspect, 0.1f, 100.0f);
