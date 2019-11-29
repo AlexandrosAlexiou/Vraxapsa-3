@@ -18,7 +18,6 @@
 
 using namespace std;
 
-//DEFINES
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 600
 #define maxx 15
@@ -41,6 +40,12 @@ static void drawBox(GLfloat size, GLenum type);
 void loadRockTexture(const char* filename);
 void loadPaperTexture(const char* filename);
 void loadScissorsTexture(const char* filename);
+//implementing randomness
+void fixRandom();
+void fixColours();
+//matching
+void match3s();
+void match2s();
 
 // Global Variables
 int num = 0;
@@ -84,7 +89,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE);
-    glutInitWindowPosition(300, 300);
+    glutInitWindowPosition(0, 0);
     glutInitWindowSize(SCREEN_WIDTH,SCREEN_HEIGHT);
     glutCreateWindow("VraXaPsa III");
     glutCreateMenu(Menu);
@@ -92,7 +97,7 @@ int main(int argc, char** argv)
     glutAddMenuEntry("Exit", 2);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
     glutKeyboardFunc(keyboard);
-    //glutSpecialFunc(arrowFunctions);
+    glutSpecialFunc(arrowFunctions);
     glutDisplayFunc(display);
     glutIdleFunc(idle);
     glutMouseFunc(mouseButton);
@@ -100,11 +105,2199 @@ int main(int argc, char** argv)
     initGL();
     glutMainLoop();
 }
+void match2s() {
+    int i, j;
+    for (i = 0; i < maxx; i++) {
+        for (j = 0; j < maxy; j++) {
+            //going up
+            if (j + 1 <= 14) {
+                if (::array[i][j].isPaper() && ::array[i][j+1].isScissor()) {    //paper-scissor =>paper is destroyed
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                    
+                }
+                else if (::array[i][j].isScissor() && ::array[i ][j + 1].isPaper()){ //scissor-paper =>paper is destroyed
+                    ::array[i ][j + 1].setRed(0);
+                    ::array[i][j + 1].setGreen(0);
+                    ::array[i ][j + 1].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i ][j + 1].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isScissor() && ::array[i ][j + 1].isRock()) { //scissor-rock =>scissor is destroyed)
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isRock() && ::array[i][j + 1].isScissor()) {    //rock-scissor =>scissor is destroyed)
+                    ::array[i][j + 1].setRed(0);
+                    ::array[i][j + 1].setGreen(0);
+                    ::array[i][j + 1].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j + 1].setCubeTexture(texture_names[0]);
+
+                
+                }
+                else if (::array[i][j].isRock() && ::array[i][j + 1].isPaper()) {    //rock-paper =>rock is destroyed)
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isPaper() && ::array[i][j + 1].isRock()) {    //paper -rock =>rock is destroyed)
+                    ::array[i][j + 1].setRed(0);
+                    ::array[i][j + 1].setGreen(0);
+                    ::array[i][j + 1].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j + 1].setCubeTexture(texture_names[0]);
+                
+                }
+
+            }
+            //going down
+            if (j-1>=0) {
+                if (::array[i][j].isPaper() && ::array[i][j - 1].isScissor()) {    //paper-scissor =>paper is destroyed
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isScissor() && ::array[i][j - 1].isPaper()) { //scissor-paper =>paper is destroyed
+                    ::array[i][j - 1].setRed(0);
+                    ::array[i][j - 1].setGreen(0);
+                    ::array[i][j - 1].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j - 1].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isScissor() && ::array[i][j - 1].isRock()) { //scissor-rock =>scissor is destroyed)
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isRock() && ::array[i][j - 1].isScissor()) {    //rock-scissor =>scissor is destroyed)
+                    ::array[i][j - 1].setRed(0);
+                    ::array[i][j - 1].setGreen(0);
+                    ::array[i][j - 1].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j - 1].setCubeTexture(texture_names[0]);
 
 
+                }
+                else if (::array[i][j].isRock() && ::array[i][j - 1].isPaper()) {    //rock-paper =>rock is destroyed)
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isPaper() && ::array[i][j - 1].isRock()) {    //paper -rock =>rock is destroyed)
+                    ::array[i][j - 1].setRed(0);
+                    ::array[i][j - 1].setGreen(0);
+                    ::array[i][j - 1].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j - 1].setCubeTexture(texture_names[0]);
 
+                }
+            
+            
+            }
+            //going left
+            if (i - 1 >= 0) {
+                if (::array[i][j].isPaper() && ::array[i - 1][j].isScissor()) {    //paper-scissor =>paper is destroyed
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isScissor() && ::array[i - 1][j].isPaper()) { //scissor-paper =>paper is destroyed
+                    ::array[i - 1][j ].setRed(0);
+                    ::array[i - 1][j ].setGreen(0);
+                    ::array[i - 1][j ].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i - 1][j ].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isScissor() && ::array[i - 1][j].isRock()) { //scissor-rock =>scissor is destroyed)
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isRock() && ::array[i - 1][j].isScissor()) {    //rock-scissor =>scissor is destroyed)
+                    ::array[i - 1][j ].setRed(0);
+                    ::array[i - 1][j ].setGreen(0);
+                    ::array[i - 1][j ].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i - 1][j ].setCubeTexture(texture_names[0]);
+
+
+                }
+                else if (::array[i][j].isRock() && ::array[i - 1][j ].isPaper()) {    //rock-paper =>rock is destroyed)
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isPaper() && ::array[i - 1][j ].isRock()) {    //paper -rock =>rock is destroyed)
+                    ::array[i - 1][j].setRed(0);
+                    ::array[i - 1][j ].setGreen(0);
+                    ::array[i - 1][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i - 1][j].setCubeTexture(texture_names[0]);
+                }
+            }
+            //going right
+            if (i + 1 <= 14) {
+                if (::array[i][j].isPaper() && ::array[i + 1][j].isScissor()) {    //paper-scissor =>paper is destroyed
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isScissor() && ::array[i + 1][j].isPaper()) { //scissor-paper =>paper is destroyed
+                    ::array[i + 1][j].setRed(0);
+                    ::array[i + 1][j].setGreen(0);
+                    ::array[i + 1][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i + 1][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isScissor() && ::array[i + 1][j].isRock()) { //scissor-rock =>scissor is destroyed)
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isRock() && ::array[i + 1][j].isScissor()) {    //rock-scissor =>scissor is destroyed)
+                    ::array[i + 1][j].setRed(0);
+                    ::array[i + 1][j].setGreen(0);
+                    ::array[i + 1][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i + 1][j].setCubeTexture(texture_names[0]);
+
+
+                }
+                else if (::array[i][j].isRock() && ::array[i + 1][j].isPaper()) {    //rock-paper =>rock is destroyed)
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+                }
+                else if (::array[i][j].isPaper() && ::array[i + 1][j].isRock()) {    //paper -rock =>rock is destroyed)
+                    ::array[i + 1][j].setRed(0);
+                    ::array[i + 1][j].setGreen(0);
+                    ::array[i + 1][j].setBlue(0);
+                    score_number = score_number + 2;
+                    ::array[i + 1][j].setCubeTexture(texture_names[0]);
+                }
+            }
+
+            
+        }
+    
+    }
+
+}
+void match3s()
+{
+    int counter = 0;
+    int i, j;
+    for (i = 0; i < maxx; i++)
+    {
+        for (j = 0; j < maxy; j++)
+        {
+            if (j - 1 >= 0 && j + 1 <= 14) {
+            //=====================================3 Blues katheta
+                if (::array[i][j].isBlue() && ::array[i][j + 1].isBlue() && ::array[i][j - 1].isBlue())
+                {
+                    ::array[i][j].setBlue(0);
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+
+                    ::array[i][j + 1].setBlue(0);
+                    ::array[i][j + 1].setRed(0);
+                    ::array[i][j + 1].setGreen(0);
+
+                    ::array[i][j - 1].setBlue(0);
+                    ::array[i][j - 1].setRed(0);
+                    ::array[i][j - 1].setGreen(0);
+
+                    score_number = score_number + 10;
+                    printf("SPASIMO KATHETO se BLUE\n");
+                    printf("ESPASAN TA i: %d j: %d i: %d j: %d i: %d j:%d\n", i, j - 1, i, j, i, j + 1);
+                }
+            }
+            //===================================== 3 Blues orizontia
+            if (i + 1 <= 14 && i - 1 >= 0) {
+                if (::array[i][j].isBlue() && ::array[i + 1][j].isBlue() && ::array[i - 1][j].isBlue())
+                {
+                    ::array[i][j].setBlue(0);
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+
+                    ::array[i + 1][j].setBlue(0);
+                    ::array[i + 1][j].setRed(0);
+                    ::array[i + 1][j].setGreen(0);
+
+                    ::array[i - 1][j].setBlue(0);
+                    ::array[i - 1][j].setRed(0);
+                    ::array[i - 1][j].setGreen(0);
+
+                    score_number = score_number + 10;
+                    printf("SPASIMO ORIZONTIO se BLUE\n");
+                    printf("ESPASAN TA i: %d j: %d i: %d j: %d i: %d j:%d\n", i - 1, j, i, j, i + 1, j);
+
+                }
+            }
+            //===================================== 3 Reds Katheta
+            if(j - 1 >= 0 && j + 1 <= 14){
+                if (::array[i][j].isRed() && ::array[i][j + 1].isRed() && ::array[i][j - 1].isRed()) {
+                
+                    ::array[i][j].setBlue(0);
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+
+                    ::array[i][j + 1].setBlue(0);
+                    ::array[i][j + 1].setRed(0);
+                    ::array[i][j + 1].setGreen(0);
+
+                    ::array[i][j - 1].setBlue(0);
+                    ::array[i][j - 1].setRed(0);
+                    ::array[i][j - 1].setGreen(0);
+
+                    score_number = score_number + 10;
+                    printf("SPASIMO KATHETO se RED\n");
+                    printf("ESPASAN TA i: %d j: %d i: %d j: %d i: %d j:%d\n", i, j - 1, i, j, i, j + 1);
+
+                }
+
+            }
+            //===================================== 3 Reds orizontia
+            if (i + 1 <= 14 && i - 1 >= 0) {
+                if (::array[i][j].isRed() && ::array[i + 1][j].isRed() && ::array[i - 1][j].isRed())
+                {
+                    ::array[i][j].setBlue(0);
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+
+                    ::array[i + 1][j].setBlue(0);
+                    ::array[i + 1][j].setRed(0);
+                    ::array[i + 1][j].setGreen(0);
+
+                    ::array[i - 1][j].setBlue(0);
+                    ::array[i - 1][j].setRed(0);
+                    ::array[i - 1][j].setGreen(0);
+
+                    score_number = score_number + 10;
+                    printf("SPASIMO ORIZONTIO se RED\n");
+                    printf("ESPASAN TA i: %d j: %d i: %d j: %d i: %d j:%d\n", i - 1, j, i, j, i + 1, j);
+
+                }
+            }
+
+            //================================== 3 rocks   orizontia
+            if (i + 1 <= 14 && i - 1 >= 0) {
+                if (::array[i][j].isRock() && ::array[i + 1][j].isRock() && ::array[i - 1][j].isRock())
+                {
+
+                    ::array[i][j].setBlue(0);
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+
+                    ::array[i + 1][j].setBlue(0);
+                    ::array[i + 1][j].setRed(0);
+                    ::array[i + 1][j].setGreen(0);
+                    ::array[i + 1][j].setCubeTexture(texture_names[0]);
+
+                    ::array[i - 1][j].setBlue(0);
+                    ::array[i - 1][j].setRed(0);
+                    ::array[i - 1][j].setGreen(0);
+                    ::array[i - 1][j].setCubeTexture(texture_names[0]);
+
+                    score_number = score_number + 10;
+                    printf("SPASIMO ORIZONTIO se ROCK\n");
+                    printf("ESPASAN TA i: %d j: %d i: %d j: %d i: %d j:%d\n", i - 1, j, i, j, i + 1, j);
+                    
+                    // ARISTERO APO TA 3
+                    // left
+                    int column =i-1;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isScissor())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+
+                    //up
+                    counter=0;
+                    int row =j+1;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i-1][k].isBlue() || ::array[i-1][k].isRed()){
+                                ::array[i-1][k].setBlue(0);
+                                ::array[i-1][k].setRed(0);
+                                ::array[i-1][k].setGreen(0);
+                                ::array[i-1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i-1][k].isScissor())
+                        {
+                            ::array[i-1][k].setBlue(0);
+                            ::array[i-1][k].setRed(0);
+                            ::array[i-1][k].setGreen(0);
+                            ::array[i-1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //down
+                    counter=0;
+                    row =j-1;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i-1][k].isBlue() || ::array[i-1][k].isRed())
+                            {
+                                ::array[i-1][k].setBlue(0);
+                                ::array[i-1][k].setRed(0);
+                                ::array[i-1][k].setGreen(0);
+                                ::array[i-1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i-1][k].isScissor())
+                        {
+                            ::array[i-1][k].setBlue(0);
+                            ::array[i-1][k].setRed(0);
+                            ::array[i-1][k].setGreen(0);
+                            ::array[i-1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //MESAIO APO TA 3
+                    //up
+                    counter=0;
+                    row =j;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed()){
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isScissor())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //down
+                    counter=0;
+                    row =j;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed())
+                            {
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isScissor())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+                    //DEKSI APO TA 3
+
+
+                    //right
+                    counter=0;
+                    column =i+1;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isScissor())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                    }
+
+                    //up
+                    counter=0;
+                    row =j+1;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i+1][k].isBlue() || ::array[i+1][k].isRed()){
+                                ::array[i+1][k].setBlue(0);
+                                ::array[i+1][k].setRed(0);
+                                ::array[i+1][k].setGreen(0);
+                                ::array[i+1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i+1][k].isScissor())
+                        {
+                            ::array[i+1][k].setBlue(0);
+                            ::array[i+1][k].setRed(0);
+                            ::array[i+1][k].setGreen(0);
+                            ::array[i+1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //down
+                    counter=0;
+                    row =j-1;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i+1][k].isBlue() || ::array[i+1][k].isRed())
+                            {
+                                ::array[i+1][k].setBlue(0);
+                                ::array[i+1][k].setRed(0);
+                                ::array[i+1][k].setGreen(0);
+                                ::array[i+1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i+1][k].isScissor())
+                        {
+                            ::array[i+1][k].setBlue(0);
+                            ::array[i+1][k].setRed(0);
+                            ::array[i+1][k].setGreen(0);
+                            ::array[i+1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                }
+            }
+
+            //================================== 3 rocks   katheta
+            if (j - 1 >= 0 && j + 1 <= 14) {
+                if (::array[i][j].isRock() && ::array[i ][j + 1].isRock() && ::array[i ][j - 1].isRock()) {
+
+                    ::array[i][j].setBlue(0);
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+
+                    ::array[i ][j + 1].setBlue(0);
+                    ::array[i ][j + 1].setRed(0);
+                    ::array[i ][j + 1].setGreen(0);
+                    ::array[i ][j + 1].setCubeTexture(texture_names[0]);
+
+                    ::array[i ][j - 1].setBlue(0);
+                    ::array[i ][j - 1].setRed(0);
+                    ::array[i ][j - 1].setGreen(0);
+                    ::array[i ][j - 1].setCubeTexture(texture_names[0]);
+
+                    score_number = score_number + 10;
+                    printf("SPASIMO KATHETO se ROCK\n");
+                    printf("ESPASAN TA i: %d j: %d i: %d j: %d i: %d j:%d\n", i - 1, j, i, j, i + 1, j);
+
+                    //TO PANW APO TA 3
+                    //up
+                    counter=0;
+                    int row =j+1;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed())
+                            {
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isScissor())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    // left
+                    counter=0;
+                    int column =i-1;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j+1].isBlue() || ::array[k][j+1].isRed()){
+                                ::array[k][j+1].setBlue(0);
+                                ::array[k][j+1].setRed(0);
+                                ::array[k][j+1].setGreen(0);
+                                ::array[k][j+1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j+1].isScissor())
+                        {
+                            ::array[k][j+1].setBlue(0);
+                            ::array[k][j+1].setRed(0);
+                            ::array[k][j+1].setGreen(0);
+                            ::array[k][j+1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+                    //right
+                    counter=0;
+                    column =i+1;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j+1].isBlue() || ::array[k][j+1].isRed()){
+                                ::array[k][j+1].setBlue(0);
+                                ::array[k][j+1].setRed(0);
+                                ::array[k][j+1].setGreen(0);
+                                ::array[k][j+1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j+1].isScissor())
+                        {
+                            ::array[k][j+1].setBlue(0);
+                            ::array[k][j+1].setRed(0);
+                            ::array[k][j+1].setGreen(0);
+                            ::array[k][j+1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                    }
+                    //MESAIO APO TA 3
+                    // left
+                    counter=0;
+                    column =i;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isScissor())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+
+                    // right
+                    counter=0;
+                    column =i;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isScissor())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+                    //TERMA KATW APO TA 3
+                    //down
+                    counter=0;
+                    row =j-1;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed())
+                            {
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isScissor())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    // right
+                    counter =0;
+                    column =i+1;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j-1].isBlue() || ::array[k][j-1].isRed()){
+                                ::array[k][j-1].setBlue(0);
+                                ::array[k][j-1].setRed(0);
+                                ::array[k][j-1].setGreen(0);
+                                ::array[k][j-1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j-1].isScissor())
+                        {
+                            ::array[k][j-1].setBlue(0);
+                            ::array[k][j-1].setRed(0);
+                            ::array[k][j-1].setGreen(0);
+                            ::array[k][j-1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+
+                    // left
+                    counter=0;
+                    column =i-1;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j-1].isBlue() || ::array[k][j-1].isRed()){
+                                ::array[k][j-1].setBlue(0);
+                                ::array[k][j-1].setRed(0);
+                                ::array[k][j-1].setGreen(0);
+                                ::array[k][j-1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j-1].isScissor())
+                        {
+                            ::array[k][j-1].setBlue(0);
+                            ::array[k][j-1].setRed(0);
+                            ::array[k][j-1].setGreen(0);
+                            ::array[k][j-1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+                    
+
+                }
+
+            }
+            //================================== 3 scissors   orizontia
+            if (i + 1 <= 14 && i - 1 >= 0) {
+                if (::array[i][j].isScissor() && ::array[i + 1][j].isScissor() && ::array[i - 1][j].isScissor()) {
+
+                    ::array[i][j].setBlue(0);
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+
+                    ::array[i + 1][j].setBlue(0);
+                    ::array[i + 1][j].setRed(0);
+                    ::array[i + 1][j].setGreen(0);
+                    ::array[i + 1][j].setCubeTexture(texture_names[0]);
+
+                    ::array[i - 1][j].setBlue(0);
+                    ::array[i - 1][j].setRed(0);
+                    ::array[i - 1][j].setGreen(0);
+                    ::array[i - 1][j].setCubeTexture(texture_names[0]);
+
+                    score_number = score_number + 10;
+                    printf("SPASIMO ORIZONTIO se SCISSOR\n");
+                    printf("ESPASAN TA i: %d j: %d i: %d j: %d i: %d j:%d\n", i - 1, j, i, j, i + 1, j);
+                    
+                    // ARISTERO APO TA 3
+                    // left
+                    int column =i-1;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isPaper())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+
+                    //up
+                    counter=0;
+                    int row =j+1;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i-1][k].isBlue() || ::array[i-1][k].isRed()){
+                                ::array[i-1][k].setBlue(0);
+                                ::array[i-1][k].setRed(0);
+                                ::array[i-1][k].setGreen(0);
+                                ::array[i-1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i-1][k].isPaper())
+                        {
+                            ::array[i-1][k].setBlue(0);
+                            ::array[i-1][k].setRed(0);
+                            ::array[i-1][k].setGreen(0);
+                            ::array[i-1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //down
+                    counter=0;
+                    row =j-1;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i-1][k].isBlue() || ::array[i-1][k].isRed())
+                            {
+                                ::array[i-1][k].setBlue(0);
+                                ::array[i-1][k].setRed(0);
+                                ::array[i-1][k].setGreen(0);
+                                ::array[i-1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i-1][k].isPaper())
+                        {
+                            ::array[i-1][k].setBlue(0);
+                            ::array[i-1][k].setRed(0);
+                            ::array[i-1][k].setGreen(0);
+                            ::array[i-1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //MESAIO APO TA 3
+                    //up
+                    counter=0;
+                    row =j;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed()){
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isPaper())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //down
+                    counter=0;
+                    row =j;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed())
+                            {
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isPaper())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+                    //DEKSI APO TA 3
+
+
+                    //right
+                    counter=0;
+                    column =i+1;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isPaper())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                    }
+
+                    //up
+                    counter=0;
+                    row =j+1;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i+1][k].isBlue() || ::array[i+1][k].isRed()){
+                                ::array[i+1][k].setBlue(0);
+                                ::array[i+1][k].setRed(0);
+                                ::array[i+1][k].setGreen(0);
+                                ::array[i+1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i+1][k].isPaper())
+                        {
+                            ::array[i+1][k].setBlue(0);
+                            ::array[i+1][k].setRed(0);
+                            ::array[i+1][k].setGreen(0);
+                            ::array[i+1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //down
+                    counter=0;
+                    row =j-1;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i+1][k].isBlue() || ::array[i+1][k].isRed())
+                            {
+                                ::array[i+1][k].setBlue(0);
+                                ::array[i+1][k].setRed(0);
+                                ::array[i+1][k].setGreen(0);
+                                ::array[i+1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i+1][k].isPaper())
+                        {
+                            ::array[i+1][k].setBlue(0);
+                            ::array[i+1][k].setRed(0);
+                            ::array[i+1][k].setGreen(0);
+                            ::array[i+1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+                    
+
+
+                }
+
+            }
+            //================================== 3 scissors   katheta
+            if (j - 1 >= 0 && j + 1 <= 14) {
+                if (::array[i][j].isScissor() && ::array[i][j + 1].isScissor() && ::array[i][j - 1].isScissor()) {
+
+                    ::array[i][j].setBlue(0);
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+
+                    ::array[i][j + 1].setBlue(0);
+                    ::array[i][j + 1].setRed(0);
+                    ::array[i][j + 1].setGreen(0);
+                    ::array[i][j + 1].setCubeTexture(texture_names[0]);
+
+                    ::array[i][j - 1].setBlue(0);
+                    ::array[i][j - 1].setRed(0);
+                    ::array[i][j - 1].setGreen(0);
+                    ::array[i][j - 1].setCubeTexture(texture_names[0]);
+
+                    score_number = score_number + 10;
+                    printf("SPASIMO KATHETO se SCISSOR\n");
+                    printf("ESPASAN TA i: %d j: %d i: %d j: %d i: %d j:%d\n", i - 1, j, i, j, i + 1, j);
+
+                    //TO PANW APO TA 3
+                    //up
+                    counter=0;
+                    int row =j+1;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                       
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed())
+                            {
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isPaper())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    // left
+                    counter=0;
+                    int column =i-1;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j+1].isBlue() || ::array[k][j+1].isRed()){
+                                ::array[k][j+1].setBlue(0);
+                                ::array[k][j+1].setRed(0);
+                                ::array[k][j+1].setGreen(0);
+                                ::array[k][j+1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j+1].isPaper())
+                        {
+                            ::array[k][j+1].setBlue(0);
+                            ::array[k][j+1].setRed(0);
+                            ::array[k][j+1].setGreen(0);
+                            ::array[k][j+1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+                    //right
+                    counter=0;
+                    column =i+1;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j+1].isBlue() || ::array[k][j+1].isRed()){
+                                ::array[k][j+1].setBlue(0);
+                                ::array[k][j+1].setRed(0);
+                                ::array[k][j+1].setGreen(0);
+                                ::array[k][j+1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j+1].isPaper())
+                        {
+                            ::array[k][j+1].setBlue(0);
+                            ::array[k][j+1].setRed(0);
+                            ::array[k][j+1].setGreen(0);
+                            ::array[k][j+1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                    }
+                    //MESAIO APO TA 3
+                    // left
+                    counter=0;
+                    column =i;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isPaper())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+
+                    // right
+                    counter=0;
+                    column =i;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isPaper())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+                    //TERMA KATW APO TA 3
+                    //down
+                    counter=0;
+                    row =j-1;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed())
+                            {
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isPaper())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    // right
+                    counter =0;
+                    column =i+1;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j-1].isBlue() || ::array[k][j-1].isRed()){
+                                ::array[k][j-1].setBlue(0);
+                                ::array[k][j-1].setRed(0);
+                                ::array[k][j-1].setGreen(0);
+                                ::array[k][j-1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j-1].isPaper())
+                        {
+                            ::array[k][j-1].setBlue(0);
+                            ::array[k][j-1].setRed(0);
+                            ::array[k][j-1].setGreen(0);
+                            ::array[k][j-1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+
+                    // left
+                    counter=0;
+                    column =i-1;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j-1].isBlue() || ::array[k][j-1].isRed()){
+                                ::array[k][j-1].setBlue(0);
+                                ::array[k][j-1].setRed(0);
+                                ::array[k][j-1].setGreen(0);
+                                ::array[k][j-1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j-1].isPaper())
+                        {
+                            ::array[k][j-1].setBlue(0);
+                            ::array[k][j-1].setRed(0);
+                            ::array[k][j-1].setGreen(0);
+                            ::array[k][j-1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+                }
+
+            }
+            //================================== 3 paper   orizontia
+            if (i + 1 <= 14 && i - 1 >= 0) {
+                if (::array[i][j].isPaper() && ::array[i + 1][j].isPaper() && ::array[i - 1][j].isPaper()) {
+
+                    ::array[i][j].setBlue(0);
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+
+                    ::array[i + 1][j].setBlue(0);
+                    ::array[i + 1][j].setRed(0);
+                    ::array[i + 1][j].setGreen(0);
+                    ::array[i + 1][j].setCubeTexture(texture_names[0]);
+
+                    ::array[i - 1][j].setBlue(0);
+                    ::array[i - 1][j].setRed(0);
+                    ::array[i - 1][j].setGreen(0);
+                    ::array[i - 1][j].setCubeTexture(texture_names[0]);
+
+                    score_number = score_number + 10;
+                    printf("SPASIMO ORIZONTIO se PAPER\n");
+                    printf("ESPASAN TA i: %d j: %d i: %d j: %d i: %d j:%d\n", i - 1, j, i, j, i + 1, j);
+
+                    // ARISTERO APO TA 3
+                    // left
+                    int column =i-1;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isRock())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+
+                    //up
+                    counter=0;
+                    int row =j+1;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i-1][k].isBlue() || ::array[i-1][k].isRed()){
+                                ::array[i-1][k].setBlue(0);
+                                ::array[i-1][k].setRed(0);
+                                ::array[i-1][k].setGreen(0);
+                                ::array[i-1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number++;
+                            }
+                        }
+                        
+                        if (::array[i-1][k].isRock())
+                        {
+                            ::array[i-1][k].setBlue(0);
+                            ::array[i-1][k].setRed(0);
+                            ::array[i-1][k].setGreen(0);
+                            ::array[i-1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //down
+                    counter=0;
+                    row =j-1;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i-1][k].isBlue() || ::array[i-1][k].isRed())
+                            {
+                                ::array[i-1][k].setBlue(0);
+                                ::array[i-1][k].setRed(0);
+                                ::array[i-1][k].setGreen(0);
+                                ::array[i-1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i-1][k].isRock())
+                        {
+                            ::array[i-1][k].setBlue(0);
+                            ::array[i-1][k].setRed(0);
+                            ::array[i-1][k].setGreen(0);
+                            ::array[i-1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //MESAIO APO TA 3
+                    //up
+                    counter=0;
+                    row =j;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed()){
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isRock())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //down
+                    counter=0;
+                    row =j;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed())
+                            {
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isRock())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+                    //DEKSI APO TA 3
+
+
+                    //right
+                    counter=0;
+                    column =i+1;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isRock())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                    }
+
+                    //up
+                    counter=0;
+                    row =j+1;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i+1][k].isBlue() || ::array[i+1][k].isRed()){
+                                ::array[i+1][k].setBlue(0);
+                                ::array[i+1][k].setRed(0);
+                                ::array[i+1][k].setGreen(0);
+                                ::array[i+1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i+1][k].isRock())
+                        {
+                            ::array[i+1][k].setBlue(0);
+                            ::array[i+1][k].setRed(0);
+                            ::array[i+1][k].setGreen(0);
+                            ::array[i+1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    //down
+                    counter=0;
+                    row =j-1;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i+1][k].isBlue() || ::array[i+1][k].isRed())
+                            {
+                                ::array[i+1][k].setBlue(0);
+                                ::array[i+1][k].setRed(0);
+                                ::array[i+1][k].setGreen(0);
+                                ::array[i+1][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i+1][k].isRock())
+                        {
+                            ::array[i+1][k].setBlue(0);
+                            ::array[i+1][k].setRed(0);
+                            ::array[i+1][k].setGreen(0);
+                            ::array[i+1][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+
+                }
+
+            }
+            //================================== 3 paper   katheta
+            if (j - 1 >= 0 && j + 1 <= 14) {
+                if (::array[i][j].isPaper() && ::array[i][j + 1].isPaper() && ::array[i][j - 1].isPaper()) {
+
+                    ::array[i][j].setBlue(0);
+                    ::array[i][j].setRed(0);
+                    ::array[i][j].setGreen(0);
+                    ::array[i][j].setCubeTexture(texture_names[0]);
+
+                    ::array[i][j + 1].setBlue(0);
+                    ::array[i][j + 1].setRed(0);
+                    ::array[i][j + 1].setGreen(0);
+                    ::array[i][j + 1].setCubeTexture(texture_names[0]);
+
+                    ::array[i][j - 1].setBlue(0);
+                    ::array[i][j - 1].setRed(0);
+                    ::array[i][j - 1].setGreen(0);
+                    ::array[i][j - 1].setCubeTexture(texture_names[0]);
+
+                    score_number = score_number + 10;
+                    printf("SPASIMO KATHETO se PAPER\n");
+                    printf("ESPASAN TA i: %d j: %d i: %d j: %d i: %d j:%d\n", i - 1, j, i, j, i + 1, j);
+
+                    //TO PANW APO TA 3
+                    //up
+                    counter=0;
+                    int row =j+1;
+                    for (int k = row; k <=14; k++)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed())
+                            {
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isRock())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    // left
+                    counter=0;
+                    int column =i-1;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j+1].isBlue() || ::array[k][j+1].isRed()){
+                                ::array[k][j+1].setBlue(0);
+                                ::array[k][j+1].setRed(0);
+                                ::array[k][j+1].setGreen(0);
+                                ::array[k][j+1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j+1].isRock())
+                        {
+                            ::array[k][j+1].setBlue(0);
+                            ::array[k][j+1].setRed(0);
+                            ::array[k][j+1].setGreen(0);
+                            ::array[k][j+1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+                    //right
+                    counter=0;
+                    column =i+1;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j+1].isBlue() || ::array[k][j+1].isRed()){
+                                ::array[k][j+1].setBlue(0);
+                                ::array[k][j+1].setRed(0);
+                                ::array[k][j+1].setGreen(0);
+                                ::array[k][j+1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j+1].isRock())
+                        {
+                            ::array[k][j+1].setBlue(0);
+                            ::array[k][j+1].setRed(0);
+                            ::array[k][j+1].setGreen(0);
+                            ::array[k][j+1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                    }
+                    //MESAIO APO TA 3
+                    // left
+                    counter=0;
+                    column =i;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isRock())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+
+                    // right
+                    counter=0;
+                    column =i;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j].isBlue() || ::array[k][j].isRed()){
+                                ::array[k][j].setBlue(0);
+                                ::array[k][j].setRed(0);
+                                ::array[k][j].setGreen(0);
+                                ::array[k][j].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j].isRock())
+                        {
+                            ::array[k][j].setBlue(0);
+                            ::array[k][j].setRed(0);
+                            ::array[k][j].setGreen(0);
+                            ::array[k][j].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+                    //TERMA KATW APO TA 3
+                    //down
+                    counter=0;
+                    row =j-1;
+                    for (int k = row; k >=0; k--)
+                    {
+                        if (counter == 3) {
+                            break;
+                        }
+                        
+                        if(counter<2){
+                            if (::array[i][k].isBlue() || ::array[i][k].isRed())
+                            {
+                                ::array[i][k].setBlue(0);
+                                ::array[i][k].setRed(0);
+                                ::array[i][k].setGreen(0);
+                                ::array[i][k].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        }
+                        
+                        if (::array[i][k].isRock())
+                        {
+                            ::array[i][k].setBlue(0);
+                            ::array[i][k].setRed(0);
+                            ::array[i][k].setGreen(0);
+                            ::array[i][k].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+                        counter++;
+                        
+                    }
+
+                    // right
+                    counter =0;
+                    column =i+1;
+                    for (int k = column; k <=14; k++)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j-1].isBlue() || ::array[k][j-1].isRed()){
+                                ::array[k][j-1].setBlue(0);
+                                ::array[k][j-1].setRed(0);
+                                ::array[k][j-1].setGreen(0);
+                                ::array[k][j-1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j-1].isRock())
+                        {
+                            ::array[k][j-1].setBlue(0);
+                            ::array[k][j-1].setRed(0);
+                            ::array[k][j-1].setGreen(0);
+                            ::array[k][j-1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+
+                    // left
+                    counter=0;
+                    column =i-1;
+                    for (int k = column; k >=0; k--)
+                    {
+                        
+                        if (counter == 3) {
+                            break;
+                        }
+                        if(counter<2){
+                            if (::array[k][j-1].isBlue() || ::array[k][j-1].isRed()){
+                                ::array[k][j-1].setBlue(0);
+                                ::array[k][j-1].setRed(0);
+                                ::array[k][j-1].setGreen(0);
+                                ::array[k][j-1].setCubeTexture(texture_names[0]);
+                                score_number = score_number + 2;
+                            }else{
+                                score_number--;
+                            }
+                        
+                        }
+                        
+                        if ( ::array[k][j-1].isRock())
+                        {
+                            ::array[k][j-1].setBlue(0);
+                            ::array[k][j-1].setRed(0);
+                            ::array[k][j-1].setGreen(0);
+                            ::array[k][j-1].setCubeTexture(texture_names[0]);
+                            score_number = score_number + 3;
+                        }
+
+                        counter++;
+                        
+                    }
+                    
+                }
+
+            }
+            
+        }
+    }
+    
+}
+            
+void fixColours() {
+
+    for (i = 0; i < maxx-2 ; i++)
+    {
+        for (j = 0; j < maxy-2 ; j++)
+        {
+
+            //==============================================================================================================
+            //fix horizontal blues
+            if (::array[i][j].isBlue() && ::array[i][j + 1].isBlue() && ::array[i][j + 2].isBlue()) {
+
+                ::array[i][j + 1].setBlue(0);
+                ::array[i][j + 1].setRed(255);    //make it red
+                //::array[i][j + 1].setCubeTexture(texture_names[0]);
+            }
+            //fix vertical blues
+            if (::array[i][j].isBlue() && ::array[i + 1][j].isBlue() && ::array[i + 2][j].isBlue()) {
+
+                ::array[i + 1][j].setBlue(0);
+                ::array[i + 1][j].setRed(255);        //make it red
+                //::array[i + 1][j].setCubeTexture(texture_names[0]);
+
+            }
+
+            //==============================================================================================================
+            //fix horizontal reds
+            if (::array[i][j].isRed() && ::array[i][j + 1].isRed() && ::array[i][j + 2].isRed()) {
+
+                ::array[i][j + 1].setRed(0);
+                ::array[i][j + 1].setBlue(255);                //make it blue
+                //::array[i][j + 1].setCubeTexture(texture_names[0]);
+            }
+            //fix vertical reds
+            if (::array[i][j].isRed() && ::array[i + 1][j].isRed() && ::array[i + 2][j].isRed()) {
+                ::array[i + 1][j].setRed(0);
+                ::array[i + 1][j].setBlue(255);            //make it blue
+                //::array[i + 1][j].setCubeTexture(texture_names[0]);
+            }
+        }
+    }
+}
+//if tiles are same i fix
+void fixRandom() {
+    
+    for (i = 0; i < maxx - 1; i++)
+    {
+        for (j = 0; j < maxy - 1; j++)
+        {
+            //==================================================================================================================
+            //fix 2 horizontal items
+            if (::array[i][j].isItem() && ::array[i][j + 1].isItem()) {
+
+                ::array[i][j + 1].setCubeTexture(texture_names[0]);    //make it blue
+                ::array[i][j + 1].setRed(0);
+                ::array[i][j + 1].setGreen(0);
+
+            }
+            //fix 2 vertical items
+            if (::array[i][j].isItem() && ::array[i + 1][j].isItem()) {
+                ::array[i + 1][j].setCubeTexture(texture_names[0]);    //make it red
+                ::array[i + 1][j].setBlue(0);
+                ::array[i + 1][j].setGreen(0);
+
+            }
+            
+
+        }
+        
+    }
+    
+
+}
 void initGL()
 {
+    
     loadRockTexture("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/stone.bmp");
     loadPaperTexture("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/paper.png");
     loadScissorsTexture("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/scissors.bmp");
@@ -124,40 +2317,47 @@ void initGL()
     {
         for(j=0; j < maxy; j++)
         {
-            rng = (rand()%5)+1;//pick a random number in range [1,5]
-            if(rng==1)
+            rng = (rand()%100);//pick a random number in range [1,100]
+            
+            
+            if(rng<15)        //blue tile,no texture
             {
+                
                 ::array[i][j].setBlue(255);
                 ::array[i][j].setCubeTexture(texture_names[0]);
             }
-            else if (rng==2)
+            else if (rng>15 && rng<30)    //red tile ,no texture
             {
                 ::array[i][j].setRed(255);
                 ::array[i][j].setCubeTexture(texture_names[0]);
             }
-            else if (rng==3)
+            else if (rng > 30 && rng < 55)    //scissor
             {
                 ::array[i][j].setCubeTexture(texture_names[3]);
                 ::array[i][j].setRed(255);
                 ::array[i][j].setGreen(255);
                 ::array[i][j].setBlue(255);
             }
-            else if(rng==4)
+            else if(rng >55 && rng <80)
             {
-                ::array[i][j].setCubeTexture(texture_names[1]);
+                ::array[i][j].setCubeTexture(texture_names[1]);    //rock
                 ::array[i][j].setRed(255);
                 ::array[i][j].setGreen(255);
                 ::array[i][j].setBlue(255);
             }
             else
             {
-                ::array[i][j].setCubeTexture(texture_names[2]);
+                ::array[i][j].setCubeTexture(texture_names[2]);    //paper
                 ::array[i][j].setRed(255);
                 ::array[i][j].setGreen(255);
                 ::array[i][j].setBlue(255);
             }
         }
     }
+    fixColours();
+    fixRandom();
+    fixColours();
+    
 }
 
 void arrowFunctions(int key, int x, int y)
@@ -207,6 +2407,7 @@ void keyboard(unsigned char c, int x, int y)
         zoom_out = true;
         printf("ZOOM OUT\n");
     }
+    
 }
 
 void mouseButton(int button, int state, int x, int y)
@@ -272,6 +2473,8 @@ void idle(void)
         printf("pastX=%d pastY=%d <-------->  nextX=%d nextY=%d\n",pastX,pastY,nextX,nextY);
         moves_remaining--;
     }
+    match3s();
+    match2s();
     glutPostRedisplay();
 }
 
@@ -312,7 +2515,7 @@ void loadPaperTexture(const char* filename) {
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GL{REPEAT
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GLREPEAT
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
     gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB,width,height,GL_RGB,GL_UNSIGNED_BYTE,data);
 }
@@ -326,7 +2529,7 @@ void loadScissorsTexture(const char* filename) {
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GL{REPEAT
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GLREPEAT
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
     gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB,width,height,GL_RGB,GL_UNSIGNED_BYTE,data);
 }
@@ -365,7 +2568,7 @@ static void drawBox(GLfloat size, GLenum type)
   for (i = 5; i >= 0; i--) {
       glBegin(type);
       glNormal3fv(&n[i][0]);
-      glTexCoord2f(1.0,1.0); glVertex3fv(&v[faces[i][0]][0]);
+      glTexCoord2f(1.0,1.0);  glVertex3fv(&v[faces[i][0]][0]);
       glTexCoord2f(0.0, 1.0); glVertex3fv(&v[faces[i][1]][0]);
       glTexCoord2f(0.0, 0.0); glVertex3fv(&v[faces[i][2]][0]);
       glTexCoord2d(1.0, 0.0); glVertex3fv(&v[faces[i][3]][0]);
@@ -386,6 +2589,7 @@ void display()
     
     if(moves_remaining==0) //Game Over
     {
+        game = 0;
         //Print game over
         glPushMatrix();
         glColor3ub(255, 0, 255);
@@ -405,7 +2609,7 @@ void display()
         glColor3ub(255, 0, 255);
         string score_number_string=to_string(score_number);
         char const *kchar = score_number_string.c_str();
-        printer(6.5, 5, kchar);
+        printer(8, 5, kchar);
         glPopMatrix();
         game=-1;
     }
@@ -427,10 +2631,11 @@ void display()
    
     if(game==1)
     {
+        
         //Print SCORE:
         glPushMatrix();
         glColor3ub(255, 0, 255);
-        printer(10, 12, score);
+        printer(8, 12, score);
         glPopMatrix();
         
         //Print score number
@@ -438,7 +2643,7 @@ void display()
         glColor3ub(255, 0, 255);
         string score_number_string=to_string(score_number);
         char const *kchar = score_number_string.c_str();
-        printer(11, 12, kchar);
+        printer(10, 12, kchar);
         glPopMatrix();
         
         //Print MOVES:
@@ -452,7 +2657,7 @@ void display()
         glColor3ub(255, 0, 255);
         string moves_remaining_string = to_string(moves_remaining);
         char const *pchar = moves_remaining_string.c_str();
-        printer(1, 12, pchar);
+        printer(2, 12, pchar);
         glPopMatrix();
         
         
@@ -484,7 +2689,7 @@ void display()
                 glPopMatrix();
             }
         }
-        /*if (zoom_in)
+        if (zoom_in)
          {
             gluLookAt(0, 0, -10.5, 0, 0, -15.5,0, 1, -15.5);
             zoom_in = false;
@@ -518,7 +2723,8 @@ void display()
         {
             gluLookAt(0, -1, 0, 0, -1, -15.5, 0, 1, -15.5);
             move_down = false;
-        }*/
+        }
+        
     }
     glFlush();
     glutSwapBuffers();
@@ -555,4 +2761,3 @@ void reshape(GLsizei width, GLsizei height)
     glLoadIdentity(); // Reset // Enable perspective projection with fovy, aspect, zNear and zFar
     gluPerspective(45.0f, aspect, 0.1f, 100.0f);
 }
-

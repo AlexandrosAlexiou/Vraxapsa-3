@@ -10,8 +10,10 @@ using namespace std;
 class Cube{
     
     public:
+    
         //Default Constructor
         Cube() = default;
+    
         //Constructor
         Cube(char * texture, int r, int g, int b,double x,double y,double z){
             texture = (char*)malloc(15*sizeof(char));
@@ -23,6 +25,56 @@ class Cube{
             setY(y);
             setZ(z);
         }
+    
+        //Questions
+        bool isBlue()
+        {
+            if (blue == 255 && red == 0 && green == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+        bool isRed()
+        {
+            if (blue == 0 && red == 255 && green == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+        bool isRock()
+        {
+            if (strcmp(cubeTexture,"Rock") == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+        bool isPaper()
+        {
+            if (strcmp(cubeTexture, "Paper") == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+        bool isScissor()
+        {
+            if (strcmp(cubeTexture, "Scissor") == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+        bool isItem() {
+            if (strcmp(cubeTexture, "nothing")!=0) {
+                return true;
+            }
+            return false;
+        
+        }
+    
         // Getters-Setters
         void setCubeTexture(char* texture){
             cubeTexture=texture;
