@@ -2298,9 +2298,9 @@ void fixRandom() {
 void initGL()
 {
     
-    loadRockTexture("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/stone.bmp");
-    loadPaperTexture("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/paper.png");
-    loadScissorsTexture("/Users/alexandrosalexiou/Desktop/VraXaPsa3/VraXaPsa3/textures/scissors.bmp");
+    loadRockTexture("textures/stone.bmp");
+    loadPaperTexture("textures/paper.png");
+    loadScissorsTexture("textures/scissors.bmp");
     glEnable(GL_DEPTH);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
     //glClearDepth(1.0f);                   // Set background depth to farthest
