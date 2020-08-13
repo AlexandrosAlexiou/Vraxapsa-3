@@ -9,6 +9,7 @@
 #include <math.h>
 #include <cstdlib>
 #include <ctime>
+#include <unistd.h>
 #include <OpenGL/OpenGL.h>
 #include <GLUT/GLUT.h>
 #include "Include/Cube.h"
@@ -105,6 +106,7 @@ int main(int argc, char** argv)
     initGL();
     glutMainLoop();
 }
+
 void match2s() {
     int i, j;
     for (i = 0; i < maxx; i++) {
@@ -308,8 +310,8 @@ void match2s() {
         }
     
     }
-
 }
+
 void match3s()
 {
     int counter = 0;
@@ -2264,6 +2266,7 @@ void fixColours() {
         }
     }
 }
+
 //if tiles are same i fix
 void fixRandom() {
     
@@ -2287,17 +2290,17 @@ void fixRandom() {
                 ::array[i + 1][j].setGreen(0);
 
             }
-            
-
         }
-        
     }
-    
-
 }
+
 void initGL()
 {
-    
+    /*char buffer[256];
+    char *val = getcwd(buffer, sizeof(buffer));
+    if (val) {
+        std::cout << buffer << std::endl;
+    }*/
     loadRockTexture("textures/stone.bmp");
     loadPaperTexture("textures/paper.png");
     loadScissorsTexture("textures/scissors.bmp");
@@ -2499,7 +2502,7 @@ void loadRockTexture(const char* filename) {
     glGenTextures(1,&ID1);
     glBindTexture(GL_TEXTURE_2D,ID1);
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GL{REPEAT
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
@@ -2513,7 +2516,7 @@ void loadPaperTexture(const char* filename) {
     glGenTextures(1,&ID2);
     glBindTexture(GL_TEXTURE_2D,ID2);
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GLREPEAT
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
@@ -2527,7 +2530,7 @@ void loadScissorsTexture(const char* filename) {
     glGenTextures(1,&ID3);
     glBindTexture(GL_TEXTURE_2D,ID3);
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    //can play with those
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);//GLREPEAT
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);//ALSO
